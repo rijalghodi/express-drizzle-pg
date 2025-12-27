@@ -1,90 +1,319 @@
-# Typescript Express PostgreSQL Starter
+# Express TypeScript PostgreSQL API
 
-A robust and scalable backend boilerplate built with TypeScript, Node.js, Express, PostgreSQL, Prisma, Zod, Jest, and Supertest. This project demonstrates best practices in API development, including modular architecture, validation, authentication, database integration, and testing. Perfect for rapidly prototyping secure and maintainable server-side applications.
+A robust and production-ready RESTful API built with TypeScript, Express, PostgreSQL, and Drizzle ORM. Features include JWT authentication, Google OAuth, rate limiting, email verification, password reset, and a complete todo management system.
 
 ## Features
 
-- **TypeScript**: Strongly-typed language for enhanced development experience.
-- **Express**: Fast and minimalist web framework for Node.js.
-- **PostgreSQL**: Powerful, open-source relational database for data storage.
-- **Prisma**: Type-safe ORM for seamless interaction with PostgreSQL.
-- **Zod**: TypeScript-first schema validation library for input validation.
-- **JWT Authentication**: Secure authentication system using JSON Web Tokens (JWT).
-- **Modular Architecture**: Organized into Controllers, Services, Routes, Middlewares, Validators, and Types for clear separation of concerns.
-- **Scalability**: Built to easily scale for production-ready applications.
-- **Jest**: Testing framework for running unit and integration tests.
-- **Supertest**: HTTP assertion library for testing Express APIs.
+### Core Stack
+
+- **TypeScript**: Strongly-typed development for enhanced code quality and maintainability
+- **Express**: Fast, minimalist web framework for Node.js
+- **PostgreSQL**: Powerful, open-source relational database
+- **Drizzle ORM**: Type-safe, lightweight ORM for PostgreSQL
+- **Zod**: TypeScript-first schema validation for request validation
+
+### Authentication & Security
+
+- **JWT Authentication**: Secure token-based authentication
+- **Google OAuth 2.0**: Social authentication with Google
+- **Email Verification**: User email verification system with tokens
+- **Password Reset**: Secure forgot password and reset password flow
+- **Rate Limiting**: Global and endpoint-specific rate limiting
+  - Global: 100 requests per 10 minutes
+  - Auth endpoints: 1 request per 30 seconds (forgot password, request verification)
+- **bcrypt**: Password hashing for secure credential storage
+
+### Email System
+
+- **Nodemailer**: Email service for verification and password reset
+- **Email Templates**: Professional email templates for user communications
+
+### Architecture
+
+- **Modular Design**: Organized by Controllers, Services, Routes, Middlewares, and Validators
+- **Custom Response Handlers**: Standardized API response format
+- **Environment Configuration**: Centralized environment variable management
+- **Error Handling**: Comprehensive error handling with detailed messages
 
 ## Tech Stack
 
-- **Node.js** (Runtime)
-- **Express** (Web Framework)
-- **TypeScript** (Type Safety)
-- **PostgreSQL** (Database)
-- **Prisma** (ORM)
-- **Zod** (Schema Validation)
-- **JWT** (Authentication)
-- **Jest** (Testing Framework)
-- **Supertest** (API Testing)
+| Category       | Technology                    |
+| -------------- | ----------------------------- |
+| Runtime        | Node.js                       |
+| Language       | TypeScript                    |
+| Framework      | Express.js                    |
+| Database       | PostgreSQL                    |
+| ORM            | Drizzle ORM                   |
+| Validation     | Zod                           |
+| Authentication | JWT + Passport (Google OAuth) |
+| Security       | bcrypt, express-rate-limit    |
+| Email          | Nodemailer                    |
+| Dev Tools      | nodemon, tsx                  |
+
+## API Endpoints
+
+### Authentication Routes (`/auth`)
+
+| Method | Endpoint                     | Description                | Rate Limited | Auth Required |
+| ------ | ---------------------------- | -------------------------- | ------------ | ------------- |
+| POST   | `/auth/register`             | Register new user          | ✓ Global     | ✗             |
+| POST   | `/auth/login`                | Login with email/password  | ✓ Global     | ✗             |
+| GET    | `/auth/me`                   | Get current user profile   | ✓ Global     | ✓             |
+| POST   | `/auth/forgot-password`      | Request password reset     | ✓ 30s        | ✗             |
+| POST   | `/auth/reset-password`       | Reset password with token  | ✓ Global     | ✗             |
+| POST   | `/auth/request-verification` | Request email verification | ✓ 30s        | ✗             |
+| GET    | `/auth/verify-email/:token`  | Verify email with token    | ✓ Global     | ✗             |
+| GET    | `/auth/google`               | Initiate Google OAuth      | ✓ Global     | ✗             |
+| GET    | `/auth/google/callback`      | Google OAuth callback      | ✓ Global     | ✗             |
+
+### Todo Routes (`/todos`)
+
+| Method | Endpoint     | Description        | Auth Required |
+| ------ | ------------ | ------------------ | ------------- |
+| POST   | `/todos`     | Create new todo    | ✓             |
+| GET    | `/todos`     | Get all user todos | ✓             |
+| GET    | `/todos/:id` | Get todo by ID     | ✓             |
+| PUT    | `/todos/:id` | Update todo        | ✓             |
+| DELETE | `/todos/:id` | Delete todo        | ✓             |
+
+## Database Schema
+
+### Users Table
+
+```typescript
+{
+  id: uuid (primary key)
+  name: string | null
+  email: string (unique)
+  password: string | null (nullable for OAuth users)
+  googleId: string | null
+  image: string | null
+  isVerified: boolean (default: false)
+  createdAt: timestamp
+  updatedAt: timestamp
+}
+```
+
+### Todos Table
+
+```typescript
+{
+  id: uuid (primary key)
+  userId: uuid (foreign key → users.id)
+  title: string
+  description: string | null
+  status: boolean (default: false)
+  createdAt: timestamp
+  updatedAt: timestamp
+}
+```
+
+### Verification Tokens Table
+
+```typescript
+{
+  id: uuid (primary key)
+  userId: uuid (foreign key → users.id)
+  token: string (hashed)
+  type: 'email_verification' | 'password_reset'
+  expiresAt: timestamp
+  createdAt: timestamp
+}
+```
 
 ## Prerequisites
 
-Make sure you have the following installed on your system:
+Ensure you have the following installed:
 
-- **Node.js** (version 14.x or higher)
-- **npm** (Node Package Manager)
-- **PostgreSQL** (or a PostgreSQL service like ElephantSQL, AWS RDS, etc.)
+- **Node.js** v18.x or higher
+- **pnpm** (or npm/yarn)
+- **PostgreSQL** v14.x or higher
 
-## NPM Scripts
+## Getting Started
 
-This project includes several npm scripts to help with development and management tasks. You can run them using `npm run <script-name>`.
+### 1. Clone the Repository
 
-### Scripts
+```bash
+git clone https://github.com/yourusername/express-drizzle-pg.git
+cd express-drizzle-pg
+```
 
-- **`npm run test`**: Runs tests using Jest. The command also includes Supertest for API testing.
-- **`npm run build`**: Compiles the TypeScript code using `npx tsc -b` (build command).
-- **`npm run dev`**: Starts the development server using `nodemon` to automatically restart on file changes.
-- **`npm run start`**: Starts the application by running the compiled JavaScript file from `src/index.ts`.
-- **`npm run clean`**: Deletes the `dist` directory and all its contents (`rmdir /s /q dist`).
-- **`npm run prisma:generate`**: Runs Prisma's code generation to sync your Prisma client with the database.
-- **`npm run prisma:migrate`**: Applies database migrations using Prisma's `migrate dev` command for local development.
+### 2. Install Dependencies
 
-These scripts help streamline the development process and ensure smooth operation across different environments.
+```bash
+pnpm install
+```
 
-## Steps to Get Started
+### 3. Environment Configuration
 
-1. Clone the repository:
-   `git clone https://github.com/yourusername/typescript-express-postgres-starter.git`
-   `cd typescript-express-postgres-starter`
+Create a `.env` file in the root directory:
 
-2. Install the dependencies:
-   `npm install`
+```env
+# Server
+EXPRESS_PORT=8000
+NODE_ENV=development
 
-3. Set up the environment variables:
-   Copy the `.env.example` file to `.env` and adjust the variables as needed.
+# Database
+DATABASE_URL=postgresql://username:password@localhost:5432/dbname
 
-4. Set up the PostgreSQL database:
-   Make sure your PostgreSQL instance is running and update the connection string in the `.env` file.
+# JWT
+JWT_SECRET=your-super-secret-jwt-key
+JWT_EXPIRATION=7d
 
-5. Run Prisma migrations to set up the database schema & also generate client:
-   `npm run prisma:migrate`
-   `npm run prisma:generate`
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:8000/auth/google/callback
 
-6. Open your browser or use Postman to test the endpoints.
+# Email (Nodemailer)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-password
+EMAIL_FROM=noreply@yourapp.com
+```
+
+### 4. Database Setup
+
+Generate migration files:
+
+```bash
+pnpm db:generate
+```
+
+Run migrations:
+
+```bash
+pnpm db:migrate
+```
+
+### 5. Start Development Server
+
+```bash
+pnpm dev
+```
+
+The server will start at `http://localhost:8000`
+
+## Available Scripts
+
+| Script             | Description                                |
+| ------------------ | ------------------------------------------ |
+| `pnpm dev`         | Start development server with hot reload   |
+| `pnpm build`       | Compile TypeScript to JavaScript           |
+| `pnpm start`       | Run compiled production build              |
+| `pnpm typecheck`   | Run TypeScript type checking               |
+| `pnpm lint`        | Run ESLint                                 |
+| `pnpm lint:fix`    | Fix ESLint errors and format with Prettier |
+| `pnpm db:generate` | Generate Drizzle migration files           |
+| `pnpm db:migrate`  | Run database migrations                    |
+
+## Project Structure
+
+```
+express-drizzle-pg/
+├── src/
+│   ├── config/          # Configuration files (env, database, OAuth)
+│   ├── controllers/     # Request handlers
+│   ├── db/             # Database schema and client
+│   ├── middlewares/    # Custom middleware (auth, rate limiting)
+│   ├── routes/         # API route definitions
+│   ├── services/       # Business logic layer
+│   ├── types/          # TypeScript type definitions
+│   ├── validators/     # Zod validation schemas
+│   └── index.ts        # Application entry point
+├── drizzle/            # Database migrations
+├── .env                # Environment variables
+├── package.json
+└── tsconfig.json
+```
+
+## Example Usage
+
+### Register a New User
+
+```bash
+curl -X POST http://localhost:8000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "SecurePass123!"
+  }'
+```
+
+### Login
+
+```bash
+curl -X POST http://localhost:8000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "SecurePass123!"
+  }'
+```
+
+### Get Current User
+
+```bash
+curl -X GET http://localhost:8000/auth/me \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Create a Todo
+
+```bash
+curl -X POST http://localhost:8000/todos \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Complete project",
+    "description": "Finish the API documentation"
+  }'
+```
+
+## Rate Limiting
+
+This API implements rate limiting to prevent abuse:
+
+- **Global Rate Limit**: 100 requests per 10 minutes per IP address
+- **Auth Endpoints** (`/forgot-password`, `/request-verification`): 1 request per 30 seconds per IP
+
+When rate limit is exceeded, you'll receive a `429 Too Many Requests` response.
+
+## Security Features
+
+✅ Password hashing with bcrypt  
+✅ JWT token-based authentication  
+✅ Rate limiting on sensitive endpoints  
+✅ Email verification for new accounts  
+✅ Secure password reset flow with expiring tokens  
+✅ Input validation with Zod  
+✅ SQL injection prevention via Drizzle ORM  
+✅ Environment variable protection
 
 ## Contributing
 
-If you'd like to contribute to this project, feel free to fork the repository, create a new branch, and submit a pull request. Contributions are always welcome!
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the ISC License.
 
 ## Acknowledgements
 
-A big thank you to the creators and maintainers of the following libraries and technologies used in this project:
+Special thanks to the creators and maintainers of:
 
-- **[TypeScript](https://www.typescriptlang.org/)**: For providing strong typing and a better development experience.
-- **[Node.js](https://nodejs.org/)**: For enabling scalable server-side JavaScript execution.
-- **[Express](https://expressjs.com/)**: For making building APIs easy and fast.
-- **[PostgreSQL](https://www.postgresql.org/)**: For providing a powerful relational database solution.
-- **[Zod](https://github.com/colinhacks/zod)**: For simplifying schema validation in TypeScript.
-- **[Prisma](https://www.prisma.io/)**: For ORM support and easier database management.
-- **[Jest](https://jestjs.io/)**: For running tests and ensuring quality.
-- **[Supertest](https://github.com/visionmedia/supertest)**: For HTTP assertions and API testing.
+- [TypeScript](https://www.typescriptlang.org/) - Typed JavaScript
+- [Express](https://expressjs.com/) - Web framework
+- [PostgreSQL](https://www.postgresql.org/) - Database
+- [Drizzle ORM](https://orm.drizzle.team/) - Type-safe ORM
+- [Zod](https://zod.dev/) - Schema validation
+- [Passport](http://www.passportjs.org/) - Authentication middleware
+- [Nodemailer](https://nodemailer.com/) - Email service
