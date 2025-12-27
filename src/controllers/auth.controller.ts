@@ -144,7 +144,6 @@ const AuthController = {
 
         // Return token as JSON (for SPA/API clients)
         res.success({
-          message: "Authentication successful",
           token,
           user: {
             id: user.id,
@@ -184,9 +183,7 @@ const AuthController = {
         return;
       }
 
-      res.success({
-        message: "If your email is registered, you will receive a password reset link",
-      });
+      res.success("If your email is registered, you will receive a password reset link");
     } catch (error) {
       console.error("Forgot password error:", error);
       res.error("Failed to process password reset request", 500);
@@ -212,9 +209,7 @@ const AuthController = {
         return;
       }
 
-      res.success({
-        message: "Password reset successfully",
-      });
+      res.success("Password reset successfully");
     } catch (error) {
       console.error("Reset password error:", error);
       res.error("Failed to reset password", 500);
@@ -238,9 +233,7 @@ const AuthController = {
 
       if (!user) {
         // Don't reveal if user exists (security best practice)
-        res.success({
-          message: "If your email is registered, you will receive a verification email",
-        });
+        res.success("If your email is registered, you will receive a verification email");
         return;
       }
 
@@ -257,9 +250,7 @@ const AuthController = {
         return;
       }
 
-      res.success({
-        message: "Verification email sent successfully",
-      });
+      res.success("Verification email sent successfully");
     } catch (error) {
       console.error("Request verification error:", error);
       res.error("Failed to send verification email", 500);
@@ -283,9 +274,7 @@ const AuthController = {
         return;
       }
 
-      res.success({
-        message: "Email verified successfully",
-      });
+      res.success("Email verified successfully");
     } catch (error) {
       console.error("Verify email error:", error);
       res.error("Failed to verify email", 500);

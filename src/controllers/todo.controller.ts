@@ -13,7 +13,7 @@ import { todoSchema, updateTodoSchema } from "../validators/todo.schema";
 const TodoController = {
   createTodo: async (
     req: Request<object, object, CreateTodoRequestDTO>,
-    res: Response
+    res: Response<CreateTodoResponseDTO>
   ): Promise<void> => {
     try {
       //Check if user is authenticated / has valid token
@@ -31,12 +31,7 @@ const TodoController = {
         description,
       });
 
-      const response: CreateTodoResponseDTO = {
-        message: "Todo created successfully",
-        todo: newtodo,
-      };
-
-      res.success(response);
+      res.success(newtodo);
       return;
     } catch (_error) {
       res.error("Error creating todo", 500);
@@ -44,7 +39,7 @@ const TodoController = {
     }
   },
 
-  getUserTodos: async (req: Request, res: Response): Promise<void> => {
+  getUserTodos: async (req: Request, res: Response<TodoResponseDTO[]>): Promise<void> => {
     try {
       //Check if user is authenticated / has valid token
       if (!req.authUser) {
@@ -56,18 +51,7 @@ const TodoController = {
 
       const todos = await TodoService.getUserTodos(userId);
 
-      const response: TodoResponseDTO = {
-        message: "Todo fetched successfully",
-        todos: todos.map((todo) => ({
-          id: todo.id,
-          title: todo.title,
-          description: todo.description,
-          status: todo.status,
-          userId: todo.userId,
-        })),
-      };
-
-      res.success(response);
+      res.success(todos);
       return;
     } catch (_error) {
       res.error("Error fetching todos", 500);
@@ -77,7 +61,7 @@ const TodoController = {
 
   updateTodo: async (
     req: Request<{ id: string }, object, UpdateTodoRequestDTO>,
-    res: Response
+    res: Response<UpdateTodoResponseDTO>
   ): Promise<void> => {
     try {
       //Check if user is authenticated / has valid token
@@ -100,12 +84,7 @@ const TodoController = {
         return;
       }
 
-      const response: UpdateTodoResponseDTO = {
-        message: "Todo updated successfully",
-        todo: updatedTodo,
-      };
-
-      res.success(response);
+      res.success(updatedTodo);
       return;
     } catch (_error) {
       res.error("Error updating todo", 500);
@@ -128,7 +107,7 @@ const TodoController = {
         return;
       }
 
-      res.success({ message: "Todo deleted successfully" });
+      res.success("Todo deleted successfully");
       return;
     } catch (_error) {
       res.error("Error deleting todo", 500);
