@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { boolean, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("user", {
   id: uuid("id")
@@ -10,6 +10,13 @@ export const usersTable = pgTable("user", {
   name: varchar("name", { length: 255 }),
   googleId: varchar("google_id", { length: 255 }),
   image: text("image"),
+  isVerified: boolean("is_verified").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .defaultNow()
+    .$onUpdateFn(() => new Date()),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const todosTable = pgTable("todo", {
@@ -19,7 +26,13 @@ export const todosTable = pgTable("todo", {
   title: varchar("title", { length: 255 }).notNull(),
   description: varchar("description", { length: 1000 }).notNull(),
   status: boolean("status").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .defaultNow()
+    .$onUpdateFn(() => new Date()),
   userId: uuid("user_id")
     .notNull()
     .references(() => usersTable.id),
+  deletedAt: timestamp("deleted_at"),
 });

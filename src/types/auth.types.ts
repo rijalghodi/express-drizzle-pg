@@ -12,8 +12,15 @@ export type RegisterUserDTO = z.infer<typeof registerSchema>;
 export type LoginUserDTO = z.infer<typeof loginSchema>;
 
 export type RegisterUserResponseDTO = {
-  message: string;
   token: string;
-};
+} & GetUserResponseDTO;
 
 export type LoginUserResponseDTO = RegisterUserResponseDTO;
+
+export type GetUserResponseDTO = {
+  id: string;
+  email: string;
+  name: string | null;
+  isVerified: boolean;
+  image: string | null;
+};

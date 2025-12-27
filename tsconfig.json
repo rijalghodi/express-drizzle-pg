@@ -1,5 +1,5 @@
 {
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
@@ -114,5 +114,6 @@
     "paths": {
       "@/*": ["./src/*"]
     }
+    // "include": ["src/**/*.ts", "src/**/*.d.ts"]
   }
 }

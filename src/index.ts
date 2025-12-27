@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import express from "express";
 import { Express } from "express";
 import { Request } from "express";
@@ -8,11 +7,11 @@ import passport from "passport";
 import { configureGoogleOAuth } from "./config/google-oauth.config";
 import authRoutes from "./routes/auth.routes";
 import todoRoutes from "./routes/todo.routes";
-
-dotenv.config();
+import { EXPRESS_PORT } from "./config/app.config";
+import { responseMiddleware } from "./middlewares/response.middleware";
 
 // Configure Google OAuth Strategy
-// configureGoogleOAuth();
+configureGoogleOAuth();
 
 const app: Express = express();
 
@@ -20,6 +19,7 @@ app.use(express.json());
 
 // Initialize Passport (without sessions, using JWT)
 app.use(passport.initialize());
+app.use(responseMiddleware);
 
 // Request Body Content Logging Token
 morgan.token("body", (req: Request) => {
@@ -41,11 +41,9 @@ app.use(
 app.use("/auth", authRoutes);
 app.use("/todos", todoRoutes);
 
-const PORT = process.env.EXPRESS_PORT || 8000;
-
 // Store the server instance so we can close it later
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const server = app.listen(EXPRESS_PORT, () => {
+  console.log(`Server running on port ${EXPRESS_PORT}`);
 });
 
 // Export the app for testing

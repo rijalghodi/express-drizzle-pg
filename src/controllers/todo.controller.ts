@@ -18,7 +18,7 @@ const TodoController = {
     try {
       //Check if user is authenticated / has valid token
       if (!req.authUser) {
-        res.status(401).json({ message: "Unauthorized" });
+        res.error("Unauthorized", 401);
         return;
       }
 
@@ -36,10 +36,10 @@ const TodoController = {
         todo: newtodo,
       };
 
-      res.status(201).json(response);
+      res.success(response);
       return;
     } catch (_error) {
-      res.status(500).json({ message: "Error creating todo" });
+      res.error("Error creating todo", 500);
       return;
     }
   },
@@ -48,7 +48,7 @@ const TodoController = {
     try {
       //Check if user is authenticated / has valid token
       if (!req.authUser) {
-        res.status(401).json({ message: "Unauthorized" });
+        res.error("Unauthorized", 401);
         return;
       }
 
@@ -67,10 +67,10 @@ const TodoController = {
         })),
       };
 
-      res.status(200).json(response);
+      res.success(response);
       return;
     } catch (_error) {
-      res.status(500).json({ message: "Error fetching todos" });
+      res.error("Error fetching todos", 500);
       return;
     }
   },
@@ -82,7 +82,7 @@ const TodoController = {
     try {
       //Check if user is authenticated / has valid token
       if (!req.authUser) {
-        res.status(401).json({ message: "Unauthorized" });
+        res.error("Unauthorized", 401);
         return;
       }
 
@@ -96,7 +96,7 @@ const TodoController = {
       });
 
       if (!updatedTodo) {
-        res.status(404).json({ message: "Todo not found", todo: null });
+        res.error("Todo not found", 404);
         return;
       }
 
@@ -105,10 +105,10 @@ const TodoController = {
         todo: updatedTodo,
       };
 
-      res.status(200).json(response);
+      res.success(response);
       return;
     } catch (_error) {
-      res.status(500).json({ message: "Error updating todo" });
+      res.error("Error updating todo", 500);
       return;
     }
   },
@@ -116,7 +116,7 @@ const TodoController = {
   deleteTodo: async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     try {
       if (!req.authUser) {
-        res.status(401).json({ message: "Unauthorized" });
+        res.error("Unauthorized", 401);
         return;
       }
 
@@ -124,14 +124,14 @@ const TodoController = {
       const deletedTodo = await TodoService.deleteTodo(userId, req.params.id);
 
       if (!deletedTodo) {
-        res.status(404).json({ message: "Todo not found", todo: null });
+        res.error("Todo not found", 404);
         return;
       }
 
-      res.status(200).json({ message: "Todo deleted successfully" });
+      res.success({ message: "Todo deleted successfully" });
       return;
     } catch (_error) {
-      res.status(500).json({ message: "Error deleting todo" });
+      res.error("Error deleting todo", 500);
       return;
     }
   },

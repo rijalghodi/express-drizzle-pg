@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import passport from "passport";
 
 import AuthService from "../services/auth.service";
 import {
@@ -18,7 +19,7 @@ const AuthController = {
       //Checking if user already exists, method written in auth.service
       const isExistingUser = await AuthService.findUserByEmail(email);
       if (isExistingUser) {
-        res.status(400).json({ message: "User already exists" });
+        res.error("User already exists", 400);
         return;
       }
 
@@ -27,7 +28,7 @@ const AuthController = {
 
       // If user creation fails, handle the issue
       if (!user) {
-        res.status(500).json({ message: "Error registering user" });
+        res.error("Error registering user", 500);
         return;
       }
 
@@ -35,13 +36,17 @@ const AuthController = {
       const token = AuthService.generateToken(user.id, user.email);
 
       const response: RegisterUserResponseDTO = {
-        message: "User Registered Successfully",
         token,
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        isVerified: user.isVerified,
+        image: user.image,
       };
 
-      res.status(201).json(response);
+      res.success(response);
     } catch (_error) {
-      res.status(400).json({ message: "Error Registering User" });
+      res.error("Error Registering User", 400);
     }
   },
 
@@ -52,14 +57,14 @@ const AuthController = {
       //Check if user exists
       const user = await AuthService.findUserByEmail(email);
       if (!user) {
-        res.status(400).json({ message: "User does not exist" });
+        res.error("User does not exist", 400);
         return;
       }
 
       //Since the user exists, check if password is correct
       const isPasswordValid = await AuthService.comparePassword(password, user.password || "");
       if (!isPasswordValid) {
-        res.status(400).json({ message: "Invalid Password" });
+        res.error("Invalid Password", 400);
         return;
       }
 
@@ -67,15 +72,77 @@ const AuthController = {
       const token = AuthService.generateToken(user.id, user.email);
 
       const response: LoginUserResponseDTO = {
-        message: "User Logged In Successfully",
         token,
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        isVerified: user.isVerified,
+        image: user.image,
       };
 
       //Return token to user
-      res.status(200).json(response);
+      res.success(response);
     } catch (_error) {
-      res.status(400).json({ message: "Error Logging In User" });
+      res.error("Error Logging In User", 500);
     }
+  },
+
+  // Google OAuth - Initiate authentication
+  googleAuth: passport.authenticate("google", {
+    scope: ["email", "profile"],
+    session: false,
+  }),
+
+  // Google OAuth - Callback handler
+  googleCallback: [
+    passport.authenticate("google", { session: false, failureRedirect: "/auth/failure" }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        // Extract Google user data from passport
+        const googleUser = req.user as {
+          googleId: string;
+          email: string;
+          name: string;
+          profilePicture: string;
+        };
+
+        // Create or update user in database
+        const user = await AuthService.createOrUpdateGoogleUser(
+          googleUser.googleId,
+          googleUser.email,
+          googleUser.name,
+          googleUser.profilePicture
+        );
+
+        if (!user) {
+          res.error("Error creating/updating user", 500);
+          return;
+        }
+
+        // Generate JWT token
+        const token = AuthService.generateToken(user.id, user.email);
+
+        // Return token as JSON (for SPA/API clients)
+        res.success({
+          message: "Authentication successful",
+          token,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+          },
+        });
+      } catch (error) {
+        console.error("Google OAuth callback error:", error);
+        res.error("Authentication failed", 500);
+      }
+    },
+  ],
+
+  // OAuth failure handler
+  authFailure: (_req: Request, res: Response) => {
+    res.error("Authentication failed", 401);
   },
 };
 
