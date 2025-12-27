@@ -1,15 +1,15 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
-import { GOOGLE_CALLBACK_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "./app.config";
+import ENV from "./env";
 
 export const configureGoogleOAuth = () => {
   passport.use(
     new GoogleStrategy(
       {
-        clientID: GOOGLE_CLIENT_ID,
-        clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: GOOGLE_CALLBACK_URL,
+        clientID: ENV.GOOGLE_OAUTH_CLIENT_ID,
+        clientSecret: ENV.GOOGLE_OAUTH_CLIENT_SECRET,
+        callbackURL: ENV.GOOGLE_OAUTH_CLIENT_CALLBACK_URI,
       },
       async (_accessToken, _refreshToken, profile, done) => {
         try {

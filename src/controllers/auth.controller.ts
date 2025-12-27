@@ -8,13 +8,26 @@ import {
   RegisterUserDTO,
   RegisterUserResponseDTO,
 } from "../types/auth.types";
-import { loginSchema, registerSchema } from "../validators/auth.schema";
+import {
+  forgotPasswordSchema,
+  loginSchema,
+  registerSchema,
+  requestVerificationSchema,
+  resetPasswordSchema,
+} from "../validators/auth.schema";
 
 const AuthController = {
   register: async (req: Request<object, object, RegisterUserDTO>, res: Response) => {
     try {
       //Validating Incoming Data using Zod Validator
-      const { name, email, password } = registerSchema.parse(req.body);
+      const { success, data, error } = registerSchema.safeParse(req.body);
+
+      if (!success) {
+        res.error("Invalid data", 400, error.issues);
+        return;
+      }
+
+      const { name, email, password } = data;
 
       //Checking if user already exists, method written in auth.service
       const isExistingUser = await AuthService.findUserByEmail(email);
@@ -52,7 +65,14 @@ const AuthController = {
 
   login: async (req: Request<object, object, LoginUserDTO>, res: Response) => {
     try {
-      const { email, password } = loginSchema.parse(req.body);
+      const { success, data, error } = loginSchema.safeParse(req.body);
+
+      if (!success) {
+        res.error("Invalid data", 400, error.issues);
+        return;
+      }
+
+      const { email, password } = data;
 
       //Check if user exists
       const user = await AuthService.findUserByEmail(email);
@@ -143,6 +163,133 @@ const AuthController = {
   // OAuth failure handler
   authFailure: (_req: Request, res: Response) => {
     res.error("Authentication failed", 401);
+  },
+
+  // Forgot password - Request password reset
+  forgotPassword: async (req: Request, res: Response) => {
+    try {
+      const { success, data, error } = forgotPasswordSchema.safeParse(req.body);
+
+      if (!success) {
+        res.error("Invalid data", 400, error.issues);
+        return;
+      }
+
+      const { email } = data;
+
+      const sent = await AuthService.requestPasswordReset(email);
+
+      if (!sent) {
+        res.error("Failed to send password reset email", 500);
+        return;
+      }
+
+      res.success({
+        message: "If your email is registered, you will receive a password reset link",
+      });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.error("Failed to process password reset request", 500);
+    }
+  },
+
+  // Reset password using token
+  resetPassword: async (req: Request, res: Response) => {
+    try {
+      const { success, data, error } = resetPasswordSchema.safeParse(req.body);
+
+      if (!success) {
+        res.error("Invalid data", 400, error.issues);
+        return;
+      }
+
+      const { token, password } = data;
+
+      const resetted = await AuthService.resetPassword(token, password);
+
+      if (!resetted) {
+        res.error("Invalid or expired reset token", 400);
+        return;
+      }
+
+      res.success({
+        message: "Password reset successfully",
+      });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.error("Failed to reset password", 500);
+    }
+  },
+
+  // Request email verification
+  requestVerification: async (req: Request, res: Response) => {
+    try {
+      const { success, data, error } = requestVerificationSchema.safeParse(req.body);
+
+      if (!success) {
+        res.error("Invalid data", 400, error.issues);
+        return;
+      }
+
+      const { email } = data;
+
+      // Find user by email
+      const user = await AuthService.findUserByEmail(email);
+
+      if (!user) {
+        // Don't reveal if user exists (security best practice)
+        res.success({
+          message: "If your email is registered, you will receive a verification email",
+        });
+        return;
+      }
+
+      // Check if already verified
+      if (user.isVerified) {
+        res.error("Email is already verified", 400);
+        return;
+      }
+
+      const sent = await AuthService.requestEmailVerification(user.id, email);
+
+      if (!sent) {
+        res.error("Failed to send verification email", 500);
+        return;
+      }
+
+      res.success({
+        message: "Verification email sent successfully",
+      });
+    } catch (error) {
+      console.error("Request verification error:", error);
+      res.error("Failed to send verification email", 500);
+    }
+  },
+
+  // Verify email using token
+  verifyEmail: async (req: Request, res: Response) => {
+    try {
+      const { token } = req.params;
+
+      if (!token) {
+        res.error("Verification token is required", 400);
+        return;
+      }
+
+      const success = await AuthService.verifyEmail(token);
+
+      if (!success) {
+        res.error("Invalid or expired verification token", 400);
+        return;
+      }
+
+      res.success({
+        message: "Email verified successfully",
+      });
+    } catch (error) {
+      console.error("Verify email error:", error);
+      res.error("Failed to verify email", 500);
+    }
   },
 };
 

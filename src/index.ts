@@ -7,7 +7,7 @@ import passport from "passport";
 import { configureGoogleOAuth } from "./config/google-oauth.config";
 import authRoutes from "./routes/auth.routes";
 import todoRoutes from "./routes/todo.routes";
-import { EXPRESS_PORT } from "./config/app.config";
+import ENV from "./config/env";
 import { responseMiddleware } from "./middlewares/response.middleware";
 
 // Configure Google OAuth Strategy
@@ -42,8 +42,8 @@ app.use("/auth", authRoutes);
 app.use("/todos", todoRoutes);
 
 // Store the server instance so we can close it later
-const server = app.listen(EXPRESS_PORT, () => {
-  console.log(`Server running on port ${EXPRESS_PORT}`);
+const server = app.listen(ENV.EXPRESS_PORT, () => {
+  console.log(`Server running on port ${ENV.EXPRESS_PORT}`);
 });
 
 // Export the app for testing

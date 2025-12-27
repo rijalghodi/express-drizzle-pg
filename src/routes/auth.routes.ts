@@ -7,10 +7,14 @@ const router: Router = Router();
 // Traditional email/password authentication
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
-// TODO: forgot password
-// TODO: reset password
-// TODO: request verification
-// TODO: verify email
+
+// Password reset
+router.post("/forgot-password", AuthController.forgotPassword);
+router.post("/reset-password", AuthController.resetPassword);
+
+// Email verification
+router.post("/request-verification", AuthController.requestVerification);
+router.get("/verify-email/:token", AuthController.verifyEmail);
 
 // Google OAuth authentication
 router.get("/google", AuthController.googleAuth);

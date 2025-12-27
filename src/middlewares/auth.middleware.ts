@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-import { JWT_SECRET } from "../config/app.config";
+import ENV from "../config/env";
 import { JwtPayload } from "../types/auth.interface";
 
 // Middleware to check if user is authenticated / has valid token in place
@@ -20,7 +20,7 @@ export const authMiddleware = (
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, ENV.JWT_SECRET) as JwtPayload;
     req.authUser = decoded;
     next();
   } catch (_error) {

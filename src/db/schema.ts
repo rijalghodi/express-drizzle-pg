@@ -36,3 +36,16 @@ export const todosTable = pgTable("todo", {
     .references(() => usersTable.id),
   deletedAt: timestamp("deleted_at"),
 });
+
+export const verificationTokensTable = pgTable("verification_token", {
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  token: varchar("token", { length: 500 }).notNull().unique(),
+  type: varchar("type", { length: 50 }).notNull(), // 'email_verification' | 'password_reset'
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
