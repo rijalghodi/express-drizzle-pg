@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const todoSchema = z.object({
-  title: z.string().min(3, "Title must be atleast 3 characters long"),
-  description: z.string().min(3, "Description must be atleast 3 characters long"),
+  title: z.string().min(1, "Title must be atleast 1 characters long"),
+  description: z.string().optional(),
 });
 
 export const updateTodoSchema = z.object({

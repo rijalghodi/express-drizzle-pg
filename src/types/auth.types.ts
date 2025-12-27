@@ -13,11 +13,11 @@ export type LoginUserDTO = z.infer<typeof loginSchema>;
 
 export type RegisterUserResponseDTO = {
   token: string;
-} & GetUserResponseDTO;
+} & UserResponseDTO;
 
 export type LoginUserResponseDTO = RegisterUserResponseDTO;
 
-export type GetUserResponseDTO = {
+export type UserResponseDTO = {
   id: string;
   email: string;
   name: string | null;

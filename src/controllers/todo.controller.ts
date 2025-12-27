@@ -22,7 +22,14 @@ const TodoController = {
         return;
       }
 
-      const { title, description } = todoSchema.parse(req.body);
+      const { success, data, error } = todoSchema.safeParse(req.body);
+
+      if (!success) {
+        res.error("Invalid request body", 400, error.issues);
+        return;
+      }
+
+      const { title, description } = data;
 
       const userId = req.authUser.userId; //userId which is parsed from auth middleware and stored in req.authUser
 
@@ -70,7 +77,14 @@ const TodoController = {
         return;
       }
 
-      const { title, description, status } = updateTodoSchema.parse(req.body);
+      const { success, data, error } = updateTodoSchema.safeParse(req.body);
+
+      if (!success) {
+        res.error("Invalid request body", 400, error.issues);
+        return;
+      }
+
+      const { title, description, status } = data;
       const userId: string = req.authUser.userId; //userId which is parsed from auth middleware and stored in req.authUser
 
       const updatedTodo = await TodoService.updateTodo(userId, req.params.id, {
@@ -107,7 +121,7 @@ const TodoController = {
         return;
       }
 
-      res.success("Todo deleted successfully");
+      res.success(null, 200, "Todo deleted successfully");
       return;
     } catch (_error) {
       res.error("Error deleting todo", 500);

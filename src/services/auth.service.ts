@@ -54,6 +54,12 @@ const AuthService = {
     return user;
   },
 
+  //Function to find user by ID
+  findUserById: async (userId: string) => {
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId));
+    return user;
+  },
+
   //Function to find user by Google ID
   findUserByGoogleId: async (googleId: string) => {
     const [user] = await db.select().from(usersTable).where(eq(usersTable.googleId, googleId));

@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 
 export const responseMiddleware = (_req: Request, res: Response, next: NextFunction) => {
-  res.success = <T>(data: T) => {
-    res.json({
+  res.success = <T>(data?: T, statusCode = 200, message = "success") => {
+    res.status(statusCode).json({
       status: true,
-      message: "success",
+      message,
       data,
     });
   };

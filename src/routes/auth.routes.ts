@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import AuthController from "../controllers/auth.controller";
 import { authRateLimiter } from "../middlewares/rate-limiter.middleware";
+import { authMiddleware } from "../middlewares/auth.middleware";
 
 const router: Router = Router();
 
@@ -21,5 +22,8 @@ router.get("/verify-email/:token", AuthController.verifyEmail);
 router.get("/google", AuthController.googleAuth);
 router.get("/google/callback", AuthController.googleCallback);
 router.get("/failure", AuthController.authFailure);
+
+// Me
+router.get("/me", authMiddleware, AuthController.getCurrentUser);
 
 export default router;

@@ -3,6 +3,7 @@ import passport from "passport";
 
 import AuthService from "../services/auth.service";
 import {
+  UserResponseDTO,
   LoginUserDTO,
   LoginUserResponseDTO,
   RegisterUserDTO,
@@ -23,7 +24,7 @@ const AuthController = {
       const { success, data, error } = registerSchema.safeParse(req.body);
 
       if (!success) {
-        res.error("Invalid data", 400, error.issues);
+        res.error("Invalid request body", 400, error.issues);
         return;
       }
 
@@ -68,7 +69,7 @@ const AuthController = {
       const { success, data, error } = loginSchema.safeParse(req.body);
 
       if (!success) {
-        res.error("Invalid data", 400, error.issues);
+        res.error("Invalid request body", 400, error.issues);
         return;
       }
 
@@ -170,7 +171,7 @@ const AuthController = {
       const { success, data, error } = forgotPasswordSchema.safeParse(req.body);
 
       if (!success) {
-        res.error("Invalid data", 400, error.issues);
+        res.error("Invalid request body", 400, error.issues);
         return;
       }
 
@@ -196,7 +197,7 @@ const AuthController = {
       const { success, data, error } = resetPasswordSchema.safeParse(req.body);
 
       if (!success) {
-        res.error("Invalid data", 400, error.issues);
+        res.error("Invalid request body", 400, error.issues);
         return;
       }
 
@@ -209,7 +210,7 @@ const AuthController = {
         return;
       }
 
-      res.success("Password reset successfully");
+      res.success(null, 200, "Password reset successfully");
     } catch (error) {
       console.error("Reset password error:", error);
       res.error("Failed to reset password", 500);
@@ -222,7 +223,7 @@ const AuthController = {
       const { success, data, error } = requestVerificationSchema.safeParse(req.body);
 
       if (!success) {
-        res.error("Invalid data", 400, error.issues);
+        res.error("Invalid request body", 400, error.issues);
         return;
       }
 
@@ -233,7 +234,11 @@ const AuthController = {
 
       if (!user) {
         // Don't reveal if user exists (security best practice)
-        res.success("If your email is registered, you will receive a verification email");
+        res.success(
+          null,
+          200,
+          "If your email is registered, you will receive a verification email"
+        );
         return;
       }
 
@@ -250,7 +255,7 @@ const AuthController = {
         return;
       }
 
-      res.success("Verification email sent successfully");
+      res.success(null, 200, "Verification email sent successfully");
     } catch (error) {
       console.error("Request verification error:", error);
       res.error("Failed to send verification email", 500);
@@ -274,10 +279,46 @@ const AuthController = {
         return;
       }
 
-      res.success("Email verified successfully");
+      res.success(null, 200, "Email verified successfully");
     } catch (error) {
       console.error("Verify email error:", error);
       res.error("Failed to verify email", 500);
+    }
+  },
+
+  // Get current user from JWT token
+  getCurrentUser: async (req: Request, res: Response<UserResponseDTO>) => {
+    try {
+      // authMiddleware has already verified the token and set req.authUser
+      const authUser = req.authUser;
+
+      if (!authUser || !authUser.userId) {
+        res.error("Unauthorized", 401);
+        return;
+      }
+
+      // Fetch full user data from database
+      const user = await AuthService.findUserById(authUser.userId);
+
+      if (!user) {
+        res.error("User not found", 404);
+        return;
+      }
+
+      // Return user data (excluding password)
+      res.success({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        isVerified: user.isVerified,
+        image: user.image,
+        googleId: user.googleId,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      });
+    } catch (error) {
+      console.error("Get current user error:", error);
+      res.error("Failed to fetch user data", 500);
     }
   },
 };
