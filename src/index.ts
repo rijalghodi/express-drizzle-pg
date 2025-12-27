@@ -9,6 +9,7 @@ import authRoutes from "./routes/auth.routes";
 import todoRoutes from "./routes/todo.routes";
 import ENV from "./config/env";
 import { responseMiddleware } from "./middlewares/response.middleware";
+import { globalRateLimiter } from "./middlewares/rate-limiter.middleware";
 
 // Configure Google OAuth Strategy
 configureGoogleOAuth();
@@ -37,6 +38,9 @@ app.use(
     ":method :url :status :res[content-length] - :response-time ms | body: :body | params: :params"
   )
 );
+
+// Apply global rate limiter
+app.use(globalRateLimiter);
 
 app.use("/auth", authRoutes);
 app.use("/todos", todoRoutes);

@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import AuthController from "../controllers/auth.controller";
+import { authRateLimiter } from "../middlewares/rate-limiter.middleware";
 
 const router: Router = Router();
 
@@ -9,11 +10,11 @@ router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 
 // Password reset
-router.post("/forgot-password", AuthController.forgotPassword);
+router.post("/forgot-password", authRateLimiter, AuthController.forgotPassword);
 router.post("/reset-password", AuthController.resetPassword);
 
 // Email verification
-router.post("/request-verification", AuthController.requestVerification);
+router.post("/request-verification", authRateLimiter, AuthController.requestVerification);
 router.get("/verify-email/:token", AuthController.verifyEmail);
 
 // Google OAuth authentication
