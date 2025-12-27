@@ -161,9 +161,9 @@ JWT_SECRET=your-super-secret-jwt-key
 JWT_EXPIRATION=7d
 
 # Google OAuth
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-GOOGLE_CALLBACK_URL=http://localhost:8000/auth/google/callback
+GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
+GOOGLE_OAUTH_CLIENT_SECRET=your-google-client-secret
+GOOGLE_OAUTH_CALLBACK_URL=http://localhost:8000/auth/google/callback
 
 # Email (Nodemailer)
 EMAIL_HOST=smtp.gmail.com
