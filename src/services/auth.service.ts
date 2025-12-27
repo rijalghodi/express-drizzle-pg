@@ -11,9 +11,7 @@ import EmailService from "./email.service";
 const AuthService = {
   // Function to hash password
   hashPassword: async (password: string): Promise<string> => {
-    //console.log(password)
     const salt = await bcrypt.genSalt(10);
-    //console.log(salt)
     return bcrypt.hash(password, salt);
   },
 
@@ -33,7 +31,6 @@ const AuthService = {
   registerUser: async (name: string, email: string, password: string) => {
     try {
       const hashedPassword = await AuthService.hashPassword(password);
-      console.log("creating user");
 
       const [user] = await db
         .insert(usersTable)
@@ -44,7 +41,6 @@ const AuthService = {
         })
         .returning();
 
-      console.log(user);
       return user;
     } catch (error) {
       console.log(error);

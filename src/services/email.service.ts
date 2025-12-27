@@ -1,5 +1,5 @@
-import ENV from "@/config/env";
-import { transporter } from "@/config/mail.config";
+import ENV from "../config/env";
+import { transporter } from "../config/mail.config";
 
 const EmailService = {
   // Send password reset email
