@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 
+type PaginationResponseArgs = {
+  page: number;
+  pageSize: number;
+  total: number;
+};
+
 export const responseMiddleware = (_req: Request, res: Response, next: NextFunction) => {
   res.success = <T>(data?: T, statusCode = 200, message = "success") => {
     res.status(statusCode).json({
@@ -17,16 +23,16 @@ export const responseMiddleware = (_req: Request, res: Response, next: NextFunct
     });
   };
 
-  res.paginated = <T>(items: T, page: number, pageSize: number, total: number) => {
-    const totalPages = Math.ceil(total / pageSize);
+  res.paginated = <T>(items: T[], pagination: PaginationResponseArgs) => {
+    const totalPages = Math.ceil(pagination.total / pagination.pageSize);
 
     res.json({
       status: true,
       message: "success",
       data: {
-        page,
-        pageSize,
-        total,
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        total: pagination.total,
         totalPages,
         items,
       },

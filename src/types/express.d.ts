@@ -1,5 +1,7 @@
 import "express";
 
+import { PaginationResponseArgs } from "@/middlewares/response.middleware";
+
 import { JwtPayload } from "./auth.interface";
 
 declare global {
@@ -13,7 +15,7 @@ declare global {
     interface Response {
       success<T>(data?: T, statusCode?: number, message?: string): void;
       error(message: string, statusCode?: number, details?: unknown): void;
-      paginated<T>(items: T, page: number, pageSize: number, total: number): void;
+      paginated<T>(items: T[], pagination: PaginationResponseArgs): void;
     }
   }
 }

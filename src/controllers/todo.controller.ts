@@ -58,7 +58,7 @@ const TodoController = {
 
       const todos = await TodoService.getUserTodos(userId);
 
-      res.success(todos);
+      res.paginated(todos, { page: 1, pageSize: 10, total: 100 });
       return;
     } catch (_error) {
       res.error("Error fetching todos", 500);
