@@ -3,10 +3,10 @@ import { randomBytes } from "crypto";
 import { and, eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 
-import ENV from "../config/env";
-import { db } from "../config/drizzle.client";
-import { usersTable, verificationTokensTable } from "../db/schema";
-import EmailService from "./email.service";
+import { db } from "@/config/drizzle.client";
+import ENV from "@/config/env";
+import { usersTable, verificationTokensTable } from "@/db/schema";
+import EmailService from "@/services/email.service";
 
 const AuthService = {
   // Function to hash password

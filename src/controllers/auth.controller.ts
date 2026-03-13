@@ -1,21 +1,21 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import passport from "passport";
 
-import AuthService from "../services/auth.service";
+import AuthService from "@/services/auth.service";
 import {
-  UserResponseDTO,
   LoginUserDTO,
   LoginUserResponseDTO,
   RegisterUserDTO,
   RegisterUserResponseDTO,
-} from "../types/auth.types";
+  UserResponseDTO,
+} from "@/types/auth.types";
 import {
   forgotPasswordSchema,
   loginSchema,
   registerSchema,
   requestVerificationSchema,
   resetPasswordSchema,
-} from "../validators/auth.schema";
+} from "@/validators/auth.schema";
 
 const AuthController = {
   register: async (req: Request<object, object, RegisterUserDTO>, res: Response) => {
@@ -117,7 +117,7 @@ const AuthController = {
   // Google OAuth - Callback handler
   googleCallback: [
     passport.authenticate("google", { session: false, failureRedirect: "/auth/failure" }),
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: Request, res: Response) => {
       try {
         // Extract Google user data from passport
         const googleUser = req.user as {

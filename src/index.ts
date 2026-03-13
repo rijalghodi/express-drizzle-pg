@@ -4,12 +4,12 @@ import { Request } from "express";
 import morgan from "morgan";
 import passport from "passport";
 
+import ENV from "./config/env";
 import { configureGoogleOAuth } from "./config/google-oauth.config";
+import { globalRateLimiter } from "./middlewares/rate-limiter.middleware";
+import { responseMiddleware } from "./middlewares/response.middleware";
 import authRoutes from "./routes/auth.routes";
 import todoRoutes from "./routes/todo.routes";
-import ENV from "./config/env";
-import { responseMiddleware } from "./middlewares/response.middleware";
-import { globalRateLimiter } from "./middlewares/rate-limiter.middleware";
 
 // Configure Google OAuth Strategy
 configureGoogleOAuth();

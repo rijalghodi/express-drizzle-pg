@@ -1,5 +1,6 @@
-import { JwtPayload } from "./auth.interface";
 import "express";
+
+import { JwtPayload } from "./auth.interface";
 
 declare global {
   //in the global score

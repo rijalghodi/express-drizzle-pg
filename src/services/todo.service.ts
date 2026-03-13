@@ -1,8 +1,8 @@
 import { and, eq } from "drizzle-orm";
 
-import { db } from "../config/drizzle.client";
-import { todosTable } from "../db/schema";
-import { CreateTodoRequestDTO, UpdateTodoRequestDTO } from "../types/todo.types";
+import { db } from "@/config/drizzle.client";
+import { todosTable } from "@/db/schema";
+import { CreateTodoRequestDTO, UpdateTodoRequestDTO } from "@/types/todo.types";
 
 const TodoService = {
   createTodo: async (userId: string, todoData: CreateTodoRequestDTO) => {

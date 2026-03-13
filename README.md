@@ -228,6 +228,91 @@ express-drizzle-pg/
 └── tsconfig.json
 ```
 
+## Development Flow
+
+Follow these steps to add a new feature or entity to the project:
+
+### 1. Create Schema
+
+Define your database tables in `src/db/schema.ts` using Drizzle ORM's `pgTable`.
+
+```typescript
+export const newTable = pgTable("new_table_name", {
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  name: varchar("name", { length: 255 }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  // ... other columns
+});
+```
+
+### 2. Create Migration
+
+Generate and apply migrations to keep your database in sync with your schema.
+
+```bash
+# Generate SQL migration files based on schema changes
+pnpm db:generate
+
+# Apply the generated migrations to your PostgreSQL database
+pnpm db:migrate
+```
+
+### 3. Create Service
+
+Implement business logic and database interactions in `src/services/`. Services should use the `db` instance from `src/config/drizzle.client.ts`.
+
+```typescript
+import { db } from "@/config/drizzle.client";
+import { newTable } from "@/db/schema";
+
+const NewService = {
+  createItem: async (data: any) => {
+    const [item] = await db.insert(newTable).values(data).returning();
+    return item;
+  },
+  // ... other data access methods
+};
+
+export default NewService;
+```
+
+### 4. Create Controller
+
+Handle incoming HTTP requests in `src/controllers/`. Controllers should validate input (using Zod) and call the appropriate service methods. Use the standardized `res.success()` and `res.error()` helpers.
+
+```typescript
+const NewController = {
+  createItem: async (req: Request, res: Response) => {
+    try {
+      const item = await NewService.createItem(req.body);
+      res.success(item, 201);
+    } catch (error) {
+      res.error("Failed to create item", 500);
+    }
+  },
+};
+
+export default NewController;
+```
+
+### 5. Register Routes
+
+Define the API endpoints in `src/routes/` and link them to your controller methods.
+
+```typescript
+import { Router } from "express";
+import NewController from "@/controllers/new.controller";
+
+const router = Router();
+router.post("/", NewController.createItem);
+
+export default router;
+```
+
+Don't forget to mount your new router in `src/index.ts`.
+
 ## Example Usage
 
 ### Register a New User

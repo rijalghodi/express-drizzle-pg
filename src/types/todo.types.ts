@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { todoSchema, updateTodoSchema } from "../validators/todo.schema";
+import { todoSchema, updateTodoSchema } from "@/validators/todo.schema";
 
 export type CreateTodoRequestDTO = z.infer<typeof todoSchema>;
 

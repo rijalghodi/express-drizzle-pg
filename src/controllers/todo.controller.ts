@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 
-import TodoService from "../services/todo.service";
+import TodoService from "@/services/todo.service";
 import {
   CreateTodoRequestDTO,
   CreateTodoResponseDTO,
   TodoResponseDTO,
   UpdateTodoRequestDTO,
   UpdateTodoResponseDTO,
-} from "../types/todo.types";
-import { todoSchema, updateTodoSchema } from "../validators/todo.schema";
+} from "@/types/todo.types";
+import { todoSchema, updateTodoSchema } from "@/validators/todo.schema";
 
 const TodoController = {
   createTodo: async (

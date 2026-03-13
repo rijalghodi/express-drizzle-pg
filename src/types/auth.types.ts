@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { loginSchema, registerSchema } from "../validators/auth.schema";
+import { loginSchema, registerSchema } from "@/validators/auth.schema";
 
 export type AuthUserData = {
   email?: string;

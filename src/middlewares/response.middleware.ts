@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 
 export const responseMiddleware = (_req: Request, res: Response, next: NextFunction) => {
   res.success = <T>(data?: T, statusCode = 200, message = "success") => {
