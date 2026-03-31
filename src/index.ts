@@ -8,8 +8,8 @@ import ENV from "./config/env";
 import { configureGoogleOAuth } from "./config/google-oauth.config";
 import { globalRateLimiter } from "./middlewares/rate-limiter.middleware";
 import { responseMiddleware } from "./middlewares/response.middleware";
-import authRoutes from "./routes/auth.routes";
-import todoRoutes from "./routes/todo.routes";
+import { authRoutes } from "./routes/auth.routes";
+import { todoRoutes } from "./routes/todo.routes";
 
 // Configure Google OAuth Strategy
 configureGoogleOAuth();

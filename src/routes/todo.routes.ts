@@ -1,13 +1,13 @@
 import { Router } from "express";
 
-import TodoController from "@/controllers/todo.controller";
+import { todoController } from "@/controllers/todo.controller";
 import { authMiddleware } from "@/middlewares/auth.middleware";
 
 const router: Router = Router();
 
-router.post("/", authMiddleware, TodoController.createTodo);
-router.get("/", authMiddleware, TodoController.getUserTodos);
-router.put("/:id", authMiddleware, TodoController.updateTodo);
-router.delete("/:id", authMiddleware, TodoController.deleteTodo);
+router.post("/", authMiddleware, todoController.createTodo);
+router.get("/", authMiddleware, todoController.getUserTodos);
+router.put("/:id", authMiddleware, todoController.updateTodo);
+router.delete("/:id", authMiddleware, todoController.deleteTodo);
 
-export default router;
+export { router as todoRoutes };
