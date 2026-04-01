@@ -11,7 +11,8 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix && prettier --write .",
     "db:generate": "npx drizzle-kit generate",
-    "db:migrate": "npx drizzle-kit migrate"
+    "db:migrate": "npx drizzle-kit migrate",
+    "db:seed": "tsx src/db/seed.ts"
   },
   "keywords": [],
   "author": "",
