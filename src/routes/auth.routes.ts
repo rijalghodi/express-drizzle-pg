@@ -17,8 +17,6 @@ import { authRateLimiter } from "@/middlewares/rate-limiter.middleware";
 
 const router: Router = Router();
 
-router.use("/auth");
-
 // Traditional email/password authentication
 router.post("/register", register);
 router.post("/login", login);
