@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 
 import { db } from "@/config/drizzle.client";
 import ENV from "@/config/env";
+import { logger } from "@/config/logger";
 import { usersTable, verificationTokensTable } from "@/db/schema";
 import { emailService } from "@/services/email.service";
 
@@ -42,7 +43,7 @@ const registerUser = async (name: string, email: string, password: string) => {
 
     return user;
   } catch (error) {
-    console.log(error);
+    logger.error("Error registering user", error);
     return undefined;
   }
 };
@@ -119,7 +120,7 @@ const createOrUpdateGoogleUser = async (
 
     return newUser;
   } catch (error) {
-    console.log(error);
+    logger.error("Error creating/updating Google user", error);
     return undefined;
   }
 };
@@ -162,7 +163,7 @@ const generateVerificationToken = async (
     // Return the unhashed token to send to user
     return token;
   } catch (error) {
-    console.error("Error generating verification token:", error);
+    logger.error("Error generating verification token:", error);
     return undefined;
   }
 };
@@ -199,7 +200,7 @@ const verifyToken = async (token: string, type: "email_verification" | "password
 
     return undefined;
   } catch (error) {
-    console.error("Error verifying token:", error);
+    logger.error("Error verifying token:", error);
     return undefined;
   }
 };
@@ -209,7 +210,7 @@ const deleteToken = async (tokenId: string): Promise<void> => {
   try {
     await db.delete(verificationTokensTable).where(eq(verificationTokensTable.id, tokenId));
   } catch (error) {
-    console.error("Error deleting token:", error);
+    logger.error("Error deleting token:", error);
   }
 };
 
@@ -235,7 +236,7 @@ const requestPasswordReset = async (email: string): Promise<boolean> => {
 
     return true;
   } catch (error) {
-    console.error("Error requesting password reset:", error);
+    logger.error("Error requesting password reset:", error);
     return false;
   }
 };
@@ -262,7 +263,7 @@ const resetPassword = async (token: string, newPassword: string): Promise<boolea
 
     return true;
   } catch (error) {
-    console.error("Error resetting password:", error);
+    logger.error("Error resetting password:", error);
     return false;
   }
 };
@@ -282,7 +283,7 @@ const requestEmailVerification = async (userId: string, email: string): Promise<
 
     return true;
   } catch (error) {
-    console.error("Error requesting email verification:", error);
+    logger.error("Error requesting email verification:", error);
     return false;
   }
 };
@@ -306,25 +307,25 @@ const verifyEmail = async (token: string): Promise<boolean> => {
 
     return true;
   } catch (error) {
-    console.error("Error verifying email:", error);
+    logger.error("Error verifying email:", error);
     return false;
   }
 };
 
-export const authService = {
-  hashPassword,
+export {
   comparePassword,
-  generateToken,
-  registerUser,
-  findUserByEmail,
-  findUserById,
-  findUserByGoogleId,
   createOrUpdateGoogleUser,
-  generateVerificationToken,
-  verifyToken,
   deleteToken,
+  findUserByEmail,
+  findUserByGoogleId,
+  findUserById,
+  generateToken,
+  generateVerificationToken,
+  hashPassword,
+  registerUser,
+  requestEmailVerification,
   requestPasswordReset,
   resetPassword,
-  requestEmailVerification,
   verifyEmail,
+  verifyToken,
 };

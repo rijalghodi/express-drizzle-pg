@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import passport from "passport";
 
-import { authService } from "@/services/auth.service";
+import { logger } from "@/config/logger";
+import * as authService from "@/services/auth.service";
 import {
   LoginUserDTO,
   LoginUserResponseDTO,
@@ -153,7 +154,7 @@ const googleCallback = [
         },
       });
     } catch (error) {
-      console.error("Google OAuth callback error:", error);
+      logger.error("Google OAuth callback error:", error);
       res.error("Authentication failed", 500);
     }
   },
@@ -185,7 +186,7 @@ const forgotPassword = async (req: Request, res: Response) => {
 
     res.success("If your email is registered, you will receive a password reset link");
   } catch (error) {
-    console.error("Forgot password error:", error);
+    logger.error("Forgot password error:", error);
     res.error("Failed to process password reset request", 500);
   }
 };
@@ -211,7 +212,7 @@ const resetPassword = async (req: Request, res: Response) => {
 
     res.success(null, 200, "Password reset successfully");
   } catch (error) {
-    console.error("Reset password error:", error);
+    logger.error("Reset password error:", error);
     res.error("Failed to reset password", 500);
   }
 };
@@ -252,7 +253,7 @@ const requestVerification = async (req: Request, res: Response) => {
 
     res.success(null, 200, "Verification email sent successfully");
   } catch (error) {
-    console.error("Request verification error:", error);
+    logger.error("Request verification error:", error);
     res.error("Failed to send verification email", 500);
   }
 };
@@ -276,7 +277,7 @@ const verifyEmail = async (req: Request, res: Response) => {
 
     res.success(null, 200, "Email verified successfully");
   } catch (error) {
-    console.error("Verify email error:", error);
+    logger.error("Verify email error:", error);
     res.error("Failed to verify email", 500);
   }
 };
@@ -312,20 +313,20 @@ const getCurrentUser = async (req: Request, res: Response<UserResponseDTO>) => {
       updatedAt: user.updatedAt,
     });
   } catch (error) {
-    console.error("Get current user error:", error);
+    logger.error("Get current user error:", error);
     res.error("Failed to fetch user data", 500);
   }
 };
 
-export const authController = {
-  register,
-  login,
-  googleAuth,
-  googleCallback,
+export {
   authFailure,
   forgotPassword,
-  resetPassword,
-  requestVerification,
-  verifyEmail,
   getCurrentUser,
+  googleAuth,
+  googleCallback,
+  login,
+  register,
+  requestVerification,
+  resetPassword,
+  verifyEmail,
 };

@@ -42,9 +42,4 @@ const deleteTodo = async (userId: string, todoId: string) => {
   return todo;
 };
 
-export const todoService = {
-  createTodo,
-  getUserTodos,
-  updateTodo,
-  deleteTodo,
-};
+export { createTodo, deleteTodo, getUserTodos, updateTodo };

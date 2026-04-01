@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
-import { todoService } from "@/services/todo.service";
+import { logger } from "@/config/logger";
+import * as todoService from "@/services/todo.service";
 import {
   CreateTodoRequestDTO,
   CreateTodoResponseDTO,
@@ -40,6 +41,7 @@ const createTodo = async (
     res.success(newtodo);
     return;
   } catch (_error) {
+    logger.error("Error creating todo", _error);
     res.error("Error creating todo", 500);
     return;
   }
@@ -60,6 +62,7 @@ const getUserTodos = async (req: Request, res: Response<TodoResponseDTO[]>): Pro
     res.paginated(todos, { page: 1, pageSize: 10, total: 100 });
     return;
   } catch (_error) {
+    logger.error("Error fetching todos", _error);
     res.error("Error fetching todos", 500);
     return;
   }
@@ -100,6 +103,7 @@ const updateTodo = async (
     res.success(updatedTodo);
     return;
   } catch (_error) {
+    logger.error("Error updating todo", _error);
     res.error("Error updating todo", 500);
     return;
   }
@@ -123,14 +127,10 @@ const deleteTodo = async (req: Request<{ id: string }>, res: Response): Promise<
     res.success(null, 200, "Todo deleted successfully");
     return;
   } catch (_error) {
+    logger.error("Error deleting todo", _error);
     res.error("Error deleting todo", 500);
     return;
   }
 };
 
-export const todoController = {
-  createTodo,
-  getUserTodos,
-  updateTodo,
-  deleteTodo,
-};
+export { createTodo, deleteTodo, getUserTodos, updateTodo };
